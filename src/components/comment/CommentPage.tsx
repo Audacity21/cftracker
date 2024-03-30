@@ -16,7 +16,7 @@ const ContestPage = () => {
   return (
     <>
       <UtterancesComments
-        repo="mbashem/cftracker"
+        repo="audacity21/cftracker"
         issue_term="pathname"
         theme={
           state.appState.themeMod === ThemesType.DARK
