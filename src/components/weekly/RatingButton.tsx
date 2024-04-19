@@ -15,6 +15,8 @@ const RatingButton: React.FC<RatingButtonProps> = ({ week, isSelected, onSelect 
         height: '40px',
         fontSize: '1rem',
         cursor: 'pointer',
+        borderRadius: '20px',
+        margin: '5px',
       }}
       onClick={() => onSelect(week)}>
       <h6 style={{

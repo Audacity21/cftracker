@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import RatingButton from "./RatingButton";
 import problems from "../../data/jsons/problemset";
 import Problems from "./Problems";
+import { Verdict } from "../../util/DataTypes/Submission";
 
 const WeeklyPage = () => {
   const state: RootStateType = useSelector((state: RootStateType) => state);
@@ -15,6 +16,7 @@ const WeeklyPage = () => {
   const [solved, setSolved] = useState<number | null>(null);
   const [unsolved, setUnsolved] = useState<number | null>(null);
   const [solvedProblems, setSolvedProblems] = useState<any[]>([]);
+  const [attemptedProblems, setAttemptedProblems] = useState<any[]>([]);
 
   const weeks: number[] = [
     1,2,3,4,5,6,7,8,9,10
@@ -24,30 +26,38 @@ const WeeklyPage = () => {
     setSelectedWeek(week);
   };
 
+  const getProblemStatus = (problemId: string) => {
+    for (let submission of state.userSubmissions.submissions) {
+      if (submission.contestId.toString() + submission.index === problemId) {
+        return submission.verdict === Verdict.OK ? Verdict.SOLVED : Verdict.ATTEMPTED;
+      }
+    }
+    return Verdict.UNSOLVED;
+  };
+
+  useEffect(() => {
+    setIsValidUser(state.userList.handles !== ""); // Check if user data exists
+    setMaxRating(state.appState.maxRating);
+
+    // Calculate solved and attempted problems based on submissions
+    const solvedProblemsTemp = [];
+    const attemptedProblemsTemp = [];
+    for (let problem of problems) {
+      const problemId = problem.contestId.toString() + problem.index;
+      const status = getProblemStatus(problemId);
+      if (status === Verdict.SOLVED) {
+        solvedProblemsTemp.push(problem);
+      } else if (status === Verdict.ATTEMPTED) {
+        attemptedProblemsTemp.push(problem);
+      }
+    }
+    setSolvedProblems(solvedProblemsTemp);
+    setAttemptedProblems(attemptedProblemsTemp);
+  }, [state.userSubmissions.submissions, state.userList.handles, selectedWeek]); 
+
   return (
     <React.Fragment>
       <div style={styles.container}>
-        <div style={styles.userContainer}>
-          {isValidUser && (
-            <div style={styles.infoContainer}>
-              <img
-                src='https://userpic.codeforces.org/no-avatar.jpg'
-                alt='user'
-              />
-              <div>
-                <h3 style={{ color: 'grey', textTransform: 'capitalize' }}>
-                  {state.userList.handles.toString()}
-                </h3>
-                <p>
-                  Rating: {lastRating} (Max: {maxRating})
-                </p>
-                <p>
-                  Solved: {solved} Unsolved: {unsolved}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
         <div style={styles.ratingContainer}>
           {weeks.map((week) => {
             return (
@@ -65,6 +75,7 @@ const WeeklyPage = () => {
           isValidUser={isValidUser}
           handle={state.userList.handles.toString()}
           solvedProblems={solvedProblems}
+          attemptedProblems={attemptedProblems}
         />
       </div>
     </React.Fragment>
@@ -93,6 +104,7 @@ const styles: StylesType = {
     justifyContent: 'center',
     flexWrap: 'wrap',
     width: '60%',
+    marginTop: '20px',
   },
   userContainer: {
     display: 'flex',
