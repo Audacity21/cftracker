@@ -101,6 +101,13 @@ const Menu = (): JSX.Element => {
     >
       <div className="container-fluid">
         <Link to="/" className="navbar-brand">
+          <img src="https://avatars.githubusercontent.com/u/86391602?s=200&v=4" alt="bz-logo" style={{
+            width: '30px',
+            height: '30px',
+            marginRight: '10px',
+            borderRadius: '20%'
+          
+          }}/>
           <span style={{ color: state.appState.themeMod === ThemesType.DARK ? 'white' : 'black', marginRight: '50%' }}>Super Coders</span>
         </Link>
         <Navbar.Toggle aria-controls="basic-navbar-nav" className={state.appState.themeMod === ThemesType.DARK ? 'navbar-dark' : 'navbar-light'} style={{ borderColor: state.appState.themeMod === ThemesType.DARK ? 'white' : 'black' }} />

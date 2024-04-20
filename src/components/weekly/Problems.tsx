@@ -3,6 +3,8 @@ import { RootStateType } from '../../data/store';
 import { useSelector } from 'react-redux';
 import './Problems.css';
 import problems from '../../data/jsons/weeklyproblems';
+import { ThemesType } from '../../util/Theme';
+import Editorial from './Editorial';
 
 interface ProblemsProps {
   week: number;
@@ -44,9 +46,9 @@ const Problems: React.FC<ProblemsProps> = ({
           <tr>
             <th>Index</th>
             <th>Problem</th>
-            <th>Points</th>
             <th>Rating</th>
             <th>Status</th>
+            <th>Editorial</th>
           </tr>
         </thead>
         <tbody className='problem__tablebody'>
@@ -67,10 +69,12 @@ const Problems: React.FC<ProblemsProps> = ({
 
             if (solvedAttempt) {
               status = 'AC';
-              rowStyle.backgroundColor = '#d4edc9'; // Green for solved
+              if(state.appState.themeMod === ThemesType.DARK) rowStyle.backgroundColor = '#2d6148'; 
+              else rowStyle.backgroundColor = '#d4edc9';
             } else if (attemptedProblem) {
               status = 'WA'; // Assuming WA for attempted problems
-              rowStyle.backgroundColor = '#ffe3e3'; // Red for attempted
+              if(state.appState.themeMod === ThemesType.DARK) rowStyle.backgroundColor = '#52212b';
+              else rowStyle.backgroundColor = '#ffe3e3';
             }
 
             return (
@@ -82,9 +86,9 @@ const Problems: React.FC<ProblemsProps> = ({
               >
                 <td>{index++}</td>
                 <td>{problem.name}</td>
-                <td>{problem.points ? problem.points : '-'}</td>
                 <td>{problem.rating}</td>
                 <td>{status}</td>
+                <td>{problem.editorial? <Editorial link={problem.editorial} />:"NA"}</td>
               </tr>
             );
           })}

@@ -31,6 +31,11 @@ table, th, td {
     border: none;
     border-collapse: collapse;
 }
+.editorial_link{
+    color: #bb2626;
+    text-decoration: none;
+    z-index: 99;
+}
 
 @media screen and (max-width: 600px) {
     .problem__container{
