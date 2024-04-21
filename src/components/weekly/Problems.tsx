@@ -2,42 +2,53 @@ import React, { useEffect, useState } from 'react';
 import { RootStateType } from '../../data/store';
 import { useSelector } from 'react-redux';
 import './Problems.css';
-import problems from '../../data/jsons/weeklyproblems';
+import axios from 'axios';
 import { ThemesType } from '../../util/Theme';
 import Editorial from './Editorial';
+
+interface Problem {
+  contestId: number;
+  index: string;
+  name: string;
+  rating: number;
+  week: number;
+  editorial?: string;
+}
 
 interface ProblemsProps {
   week: number;
   isValidUser: boolean;
-  handle: string;
-  solvedProblems: any[]; // Define type according to your actual data structure
-  attemptedProblems: any[]; // Define type according to your actual data structure
+  solvedProblems: { contestId: number; index: string }[];
+  attemptedProblems: { contestId: number; index: string }[];
 }
 
 const Problems: React.FC<ProblemsProps> = ({
   week,
-  isValidUser,
-  handle,
   solvedProblems,
   attemptedProblems,
 }) => {
   const state: RootStateType = useSelector((state: RootStateType) => state);
-  let index = 1;
-
-  const problemsByRating: any[] = problems.filter(
-    (problem: any) => problem.week === week
-  ) || [];
-
-  const handleClick = (contestId: number, index: string) => {
-    window.open(
-      `https://codeforces.com/problemset/problem/${contestId}/${index}`,
-      '_blank'
-    );
-  };
+  const [problemsByRating, setProblemsByRating] = useState<Problem[]>([]);
 
   useEffect(() => {
-    console.log(solvedProblems[0]);
-  }, [solvedProblems]);
+    // Fetch problems from GitHub URL
+    axios
+      .get('https://raw.githubusercontent.com/Audacity21/cftracker/main/weeklyquestions.json')
+      .then((response) => {
+        console.log('Fetched problems:', response.data);
+        const allProblems: Problem[] = response.data;
+        // Filter problems by week
+        const filteredProblems = allProblems.filter((problem) => problem.week === week);
+        setProblemsByRating(filteredProblems);
+      })
+      .catch((error) => {
+        console.error('Error fetching problems:', error);
+      });
+  }, [week]); // Fetch problems when week changes
+
+  const handleClick = (contestId: number, index: string) => {
+    window.open(`https://codeforces.com/problemset/problem/${contestId}/${index}`, '_blank');
+  };
 
   return (
     <div className='problem__container'>
@@ -52,14 +63,14 @@ const Problems: React.FC<ProblemsProps> = ({
           </tr>
         </thead>
         <tbody className='problem__tablebody'>
-          {problemsByRating.map((problem: any, idx: number) => {
+          {problemsByRating.map((problem: Problem, idx: number) => {
             const solvedAttempt = solvedProblems.find(
-              (solvedProblem: any) =>
+              (solvedProblem) =>
                 solvedProblem.contestId === problem.contestId &&
                 solvedProblem.index === problem.index
             );
             const attemptedProblem = attemptedProblems.find(
-              (attemptedProblem: any) =>
+              (attemptedProblem) =>
                 attemptedProblem.contestId === problem.contestId &&
                 attemptedProblem.index === problem.index
             );
@@ -69,26 +80,26 @@ const Problems: React.FC<ProblemsProps> = ({
 
             if (solvedAttempt) {
               status = 'AC';
-              if(state.appState.themeMod === ThemesType.DARK) rowStyle.backgroundColor = '#2d6148'; 
+              if (state.appState.themeMod === ThemesType.DARK) rowStyle.backgroundColor = '#2d6148';
               else rowStyle.backgroundColor = '#d4edc9';
             } else if (attemptedProblem) {
               status = 'WA'; // Assuming WA for attempted problems
-              if(state.appState.themeMod === ThemesType.DARK) rowStyle.backgroundColor = '#52212b';
+              if (state.appState.themeMod === ThemesType.DARK) rowStyle.backgroundColor = '#52212b';
               else rowStyle.backgroundColor = '#ffe3e3';
             }
 
             return (
               <tr
                 className='problem__tablerow'
-                key={`${problem.id}-${idx}`}
+                key={`${problem.contestId}-${problem.index}`}
                 style={rowStyle}
                 onClick={() => handleClick(problem.contestId, problem.index)}
               >
-                <td>{index++}</td>
+                <td>{idx + 1}</td>
                 <td>{problem.name}</td>
                 <td>{problem.rating}</td>
                 <td>{status}</td>
-                <td>{problem.editorial? <Editorial link={problem.editorial} />:"NA"}</td>
+                <td>{problem.editorial ? <Editorial link={problem.editorial} /> : 'NA'}</td>
               </tr>
             );
           })}

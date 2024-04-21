@@ -73,7 +73,6 @@ const WeeklyPage = () => {
         <Problems
           week={selectedWeek}
           isValidUser={isValidUser}
-          handle={state.userList.handles.toString()}
           solvedProblems={solvedProblems}
           attemptedProblems={attemptedProblems}
         />

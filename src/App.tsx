@@ -11,7 +11,6 @@ import HomePage from "./components/home/HomePage";
 import ProblemPage from "./components/problem/ProblemPage";
 import ContestPage from "./components/contest/ContestPage";
 import usePageTracking from "./usePageTracking";
-import WeeklyPage from "./components/weekly/WeeklyPage";
 
 
 // const HomePage = lazy(() => import("./components/home/HomePage"));
@@ -19,6 +18,7 @@ import WeeklyPage from "./components/weekly/WeeklyPage";
 // const ContestPage = lazy(() => import("./components/contest/ContestPage"));
 const StatPage = lazy(() => import("./components/stats/StatPage"));
 const IssuePage = lazy(() => import("./components/comment/CommentPage"));
+const WeeklyPage = lazy(() => import("./components/weekly/WeeklyPage"));
 
 
 
